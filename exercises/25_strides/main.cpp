@@ -18,6 +18,20 @@ std::vector<udim> strides(std::vector<udim> const &shape) {
     // TODO: 完成函数体，根据张量形状计算张量连续存储时的步长。
     // READ: 逆向迭代器 std::vector::rbegin <https://zh.cppreference.com/w/cpp/container/vector/rbegin>
     //       使用逆向迭代器可能可以简化代码
+    auto it_shape = std::rbegin(shape);
+    auto it_strides = std::rbegin(strides);
+    for( ; it_shape != std::rend(shape);
+        it_shape++, it_strides++) {
+            if(it_shape == std::rbegin(shape)) {
+                *it_strides = 1;
+                //std::cout << *it_strides << ",";
+            } else {
+                *it_strides = *(it_shape - 1) * (*(it_strides - 1));
+                //std::cout << *it_strides << ",";
+            }
+    }
+    std::cout<<std::endl;
+
     return strides;
 }
 

@@ -10,8 +10,12 @@ struct Tensor4D {
     Tensor4D(unsigned int const shape_[4], T const *data_) {
         unsigned int size = 1;
         // TODO: 填入正确的 shape 并计算 size
+        std::copy(shape_, &shape_[4], shape);
+        size = shape[0] * shape[1] * shape[2] * shape[3];
+        //std::cout<<"shape:"<<shape[0]<<","<<shape[1]<<","<<shape[2]<<","<<shape[3]<<std::endl;
+        //std::cout<<"size:"<<size<<std::endl;
         data = new T[size];
-        std::memcpy(data, data_, size * sizeof(T));
+        std::copy(data_, data_+size, data);
     }
     ~Tensor4D() {
         delete[] data;
@@ -28,6 +32,39 @@ struct Tensor4D {
     // 则 `this` 与 `others` 相加时，3 个形状为 `[1, 2, 1, 4]` 的子张量各自与 `others` 对应项相加。
     Tensor4D &operator+=(Tensor4D const &others) {
         // TODO: 实现单向广播的加法
+        for(unsigned int d0 = 0; d0 < shape[0]; d0++)
+            for(unsigned int d1 = 0; d1 < shape[1]; d1++)
+                for(unsigned int d2 = 0; d2 < shape[2]; d2++)
+                    for(unsigned int d3 = 0; d3 < shape[3]; d3++) {
+                        unsigned int o0, o1, o2, o3;
+                        o0 = others.shape[0] > d0 ? d0 : others.shape[0] - 1;
+                        o1 = others.shape[1] > d1 ? d1 : others.shape[1] - 1;
+                        o2 = others.shape[2] > d2 ? d2 : others.shape[2] - 1;
+                        o3 = others.shape[3] > d3 ? d3 : others.shape[3] - 1;
+
+                        std::cout<<"["<<d0<<","<<d1<<","<<d2<<","<<d3<<"]"<<data[d0*shape[1]*shape[2]*shape[3] +
+                                d1*shape[2]*shape[3] +
+                                d2*shape[3] +
+                                d3]<< "+["<<o0<<","<<o1<<","<<o2<<","<<o3<<"]"<<
+                                others.data[o0*others.shape[1]*others.shape[2]*others.shape[3] + 
+                                                    o1*others.shape[2]*others.shape[3] +
+                                                    o2*others.shape[3] +
+                                                    o3]<<"=";
+                                
+                        data[d0*shape[1]*shape[2]*shape[3] +
+                                d1*shape[2]*shape[3] +
+                                d2*shape[3] +
+                                d3] += others.data[o0*others.shape[1]*others.shape[2]*others.shape[3] + 
+                                                    o1*others.shape[2]*others.shape[3] +
+                                                    o2*others.shape[3] +
+                                                    o3];
+
+                        std::cout<<data[d0*shape[1]*shape[2]*shape[3] +
+                                            d1*shape[2]*shape[3] +
+                                            d2*shape[3] +
+                                            d3]<<std::endl;
+                    }
+        
         return *this;
     }
 };

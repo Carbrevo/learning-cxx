@@ -10,17 +10,27 @@ class DynFibonacci {
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity): cache(new size_t[capacity]), cached(2) {
+        cache[0] = 0;
+        cache[1] = 1;
+    }
 
     // TODO: 实现复制构造器
-    DynFibonacci(DynFibonacci const &) = delete;
+    DynFibonacci(DynFibonacci const & df) {
+        cache = new size_t[df.cached];
+        std::copy(&df.cache[0], &df.cache[df.cached], cache);
+        cached = df.cached;
+
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci() {
+        delete[] cache;
+    };
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t get(int i) {
-        for (; false; ++cached) {
+        for (; i >= cached; ++cached) {
             cache[cached] = cache[cached - 1] + cache[cached - 2];
         }
         return cache[i];
@@ -31,7 +41,7 @@ public:
     //         本质上，方法是隐藏了 this 参数的函数
     //         const 修饰作用在 this 上，因此它们实际上参数不同
     size_t get(int i) const {
-        if (i <= cached) {
+        if (i < cached) {
             return cache[i];
         }
         ASSERT(false, "i out of range");
